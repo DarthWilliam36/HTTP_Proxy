@@ -58,5 +58,5 @@ server_address = (IP, int(port))
 httpd = ThreadedHTTPServer(server_address, MyRequestHandler)
 
 # Start the server
-print('Server running on 10.0.0.144:8882')
+print(f'Server running on {IP}:{port}')
 httpd.serve_forever()
