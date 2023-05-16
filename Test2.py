@@ -1,7 +1,12 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import socketserver
 import socket
 import select
+from OpenSSL import SSL
+from OpenSSL.crypto import FILETYPE_PEM, load_certificate, load_privatekey
+
+
+certificate = load_certificate(FILETYPE_PEM, open(certfile).read())
+private_key = load_privatekey(FILETYPE_PEM, open(keyfile).read())
 
 
 class MyRequestHandler(BaseHTTPRequestHandler):
@@ -18,19 +23,29 @@ class MyRequestHandler(BaseHTTPRequestHandler):
     def connect_relay(self):
         address = self.path.split(':', 1)
         address[1] = int(address[1]) or 443
-        try:
-            s = socket.create_connection(address, timeout=self.timeout)
-        except:
-            self.send_error(502)
-            return
 
         self.send_response(200, 'Connection Established')
         self.end_headers()
 
-        conns = [self.connection, s]
-        self.close_connection = False
+        context = SSL.Context(SSL.SSLv23_METHOD)
+        context.use_certificate(certificate)
+        context.use_privatekey(private_key)
 
-        print("New Connection: " + str(self.connection.getpeername()))
+        # Create a new SSL connection
+        ssl_connection = SSL.Connection(context, self.connection)
+        ssl_connection.set_accept_state()
+
+        # Perform the SSL handshake
+        try:
+            ssl_connection.do_handshake()
+        except SSL.Error as e:
+            print(f"SSL handshake error: {e}")
+            return
+
+        print("SSL Handshake Successful")
+
+        conns = [ssl_connection, socket.create_connection(address, timeout=self.timeout)]
+        self.close_connection = False
 
         while not self.close_connection:
             rlist, wlist, xlist = select.select(conns, [], conns, self.timeout)
@@ -38,25 +53,18 @@ class MyRequestHandler(BaseHTTPRequestHandler):
                 break
             for r in rlist:
                 other = conns[1] if r is conns[0] else conns[0]
-                data = r.recv(65535)
+                data = r.recv(8192)
                 if not data:
                     self.close_connection = True
-                    print("Broke Connection: " + str(self.connection.getpeername()))
+                    print("Connection closed")
                     break
                 other.sendall(data)
 
 
-class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
-    pass
-
-
 # Create an HTTP server with your custom request handler
-
-IP = input("Enter Server Local IP: ")
-port = input("Enter Sever Port: ")
-server_address = (IP, int(port))
-httpd = ThreadedHTTPServer(server_address, MyRequestHandler)
+server_address = ('127.0.0.1', 8882)
+httpd = HTTPServer(server_address, MyRequestHandler)
 
 # Start the server
-print('Server running on 10.0.0.144:8882')
+print('Server running on http://localhost:8882')
 httpd.serve_forever()
