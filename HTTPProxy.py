@@ -7,7 +7,7 @@ import select
 class MyRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Handle GET requests
-        print("headers: " + self.headers)
+        print("headers: " + str(self.headers))
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
