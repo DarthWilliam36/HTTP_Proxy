@@ -7,10 +7,10 @@ import select
 class MyRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Handle GET requests
+        print("headers: " + self.headers)
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write(b'Hello, World!')
 
     def do_CONNECT(self):
         self.connect_relay()
