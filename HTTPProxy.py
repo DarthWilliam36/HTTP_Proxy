@@ -12,7 +12,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
         if self.headers.get("secret-connect"):
             target_address = self.headers["secret-connect"]
             target_address = tuple(target_address.split(":"))
-            print("target address:" + str(target_address))
+            print("target address:" + str(type(target_address)))
             s = self.try_connect(target_address)
             self.connect_relay(s)
             return
