@@ -17,6 +17,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
             if not s:
                 print("Connection not good!")
                 return
+            print("sending response@@")
             self.send_response(200, 'Connection Established')
             self.end_headers()
             self.connect_relay(s)
