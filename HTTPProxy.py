@@ -1,17 +1,19 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import socket
-import select
+from CustomProxy import CustomProxy
 
 
-class MyRequestHandler(BaseHTTPRequestHandler):
+class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
     def do_GET(self):
         # Handle GET requests
         print("headers: " + str(self.headers))
 
         if self.headers.get("secret-connect"):
             target_address = self.headers["secret-connect"]
-            self.connect_relay(target_address)
+            print("target address:" + str(target_address))
+            s = self.try_connect(target_address)
+            self.connect_relay(s)
             return
 
         self.send_response(200)
@@ -20,35 +22,12 @@ class MyRequestHandler(BaseHTTPRequestHandler):
 
     def do_CONNECT(self):
         address = self.path.split(':', 1)
-        self.connect_relay(address)
-
-    def connect_relay(self, target_address):
-        try:
-            s = socket.create_connection(target_address, timeout=self.timeout)
-        except:
-            self.send_error(502)
+        s = self.try_connect(address)
+        if not s:
             return
-
         self.send_response(200, 'Connection Established')
         self.end_headers()
-
-        conns = [self.connection, s]
-        self.close_connection = False
-
-        print("New Connection: " + str(self.connection.getpeername()))
-
-        while not self.close_connection:
-            rlist, wlist, xlist = select.select(conns, [], conns, self.timeout)
-            if xlist or not rlist:
-                break
-            for r in rlist:
-                other = conns[1] if r is conns[0] else conns[0]
-                data = r.recv(65535)
-                if not data:
-                    self.close_connection = True
-                    print("Broke Connection: " + str(self.connection.getpeername()))
-                    break
-                other.sendall(data)
+        self.connect_relay(s)
 
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
