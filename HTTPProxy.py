@@ -12,12 +12,10 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
         if self.headers.get("secret-connect"):
             target_address = self.headers["secret-connect"]
             target_address = tuple(target_address.split(":"))
-            print("target address:" + str(type(target_address)))
             s = self.try_connect(target_address)
             if not s:
                 print("Connection not good!")
                 return
-            print("sending response@@")
             self.send_response(200, 'Connection Established')
             self.end_headers()
             self.connect_relay(s)

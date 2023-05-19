@@ -1,12 +1,15 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import socket
-import select
+from CustomProxy import CustomProxy
 
-proxy_address = ("52.23.193.65", 80)
+proxy_address = ("willysgrid.com", 80)
 
 
-class MyRequestHandler(BaseHTTPRequestHandler):
+class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
+    def do_GET(self):
+        print("headers: " + str(self.headers))
+
     def do_CONNECT(self):
         print("Incoming CONNECT packet:")
         print(self.raw_requestline)
@@ -15,24 +18,26 @@ class MyRequestHandler(BaseHTTPRequestHandler):
         address = self.path.split(':', 1)
         address[1] = int(address[1]) or 443
 
-        try:
-            s = socket.create_connection(proxy_address, timeout=self.timeout)
-        except:
-            self.send_error(502)
+        s = self.try_connect(proxy_address)
+        if not s:
             return
 
         request = "GET / HTTP/1.1\r\n"
-        request += f"Host: {proxy_address}\r\n"
-        request += "User-Agent: Custom User-Agent\r\n"
-        request += "Accept-Language: en-US,en;q=0.9\r\n"
-        request += f"secret-connect: {str(address)}\r\n"
-        request += "Connection: close\r\n"
+        headers = {
+            'Host': proxy_address[0],
+            'User-Agent': 'My Custom User Agent',
+            'Accept': 'text/html',
+            'secret-connect': f"{address[0]}:{address[1]}"
+        }
+
+        for header, value in headers.items():
+            request += f"{header}: {value}\r\n"
         request += "\r\n"
 
         s.sendall(request.encode())
 
-        self.send_response(200, 'Connection Established')
-        self.end_headers()
+        self.connect_relay(s)
+
 
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
