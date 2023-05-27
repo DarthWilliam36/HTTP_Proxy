@@ -1,7 +1,12 @@
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import socket
-from CustomProxy import CustomProxy
+
+if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
+    from CustomProxy import CustomProxy
+else:
+    raise RuntimeError("CustomProxy.py not found in directory!")
 
 
 class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):

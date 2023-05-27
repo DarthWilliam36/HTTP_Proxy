@@ -1,7 +1,12 @@
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import socket
-from CustomProxy import CustomProxy
+
+if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
+    from CustomProxy import CustomProxy
+else:
+    raise RuntimeError("CustomProxy.py not found in directory!")
 
 proxy_address = ("willysgrid.com", 80)
 
@@ -39,9 +44,9 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
         self.connect_relay(s)
 
 
-
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
     pass
+
 
 print("running local server on 127.0.0.1:80")
 httpd = ThreadedHTTPServer(("127.0.0.1", 80), MyRequestHandler)
