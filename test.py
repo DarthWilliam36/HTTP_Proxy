@@ -15,19 +15,16 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
         print("headers: " + str(self.headers))
 
         if self.headers.get("secret-connect"):
-            if self.headers.get("password") == password:
-                target_address = self.headers["secret-connect"]
-                target_address = tuple(target_address.split(":"))
-                s = self.try_connect(target_address)
-                if not s:
-                    print("Connection not good!")
-                    return
-                self.send_response(200, 'Connection Established')
-                self.end_headers()
-                self.connect_relay(s)
+            target_address = self.headers["secret-connect"]
+            target_address = tuple(target_address.split(":"))
+            s = self.try_connect(target_address)
+            if not s:
+                print("Connection not good!")
                 return
-            else:
-                print("Password Rejected!")
+            self.send_response(200, 'Connection Established')
+            self.end_headers()
+            self.connect_relay_secret(s, True)
+            return
 
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -40,7 +37,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
             return
         self.send_response(200, 'Connection Established')
         self.end_headers()
-        self.connect_relay(s)
+        self.connect_relay_secret(s, True)
 
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
@@ -51,7 +48,6 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
 
 IP = input("Enter Server Local IP: ")
 port = input("Enter Sever Port: ")
-password = input("Enter Access Password: ")
 server_address = (IP, int(port))
 httpd = ThreadedHTTPServer(server_address, MyRequestHandler)
 

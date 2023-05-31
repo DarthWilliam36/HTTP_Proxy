@@ -1,7 +1,6 @@
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
-import socket
 
 if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
     from CustomProxy import CustomProxy
@@ -9,6 +8,7 @@ else:
     raise RuntimeError("CustomProxy.py not found in directory!")
 
 proxy_address = ("willysgrid.com", 80)
+password = ""
 
 
 class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
@@ -32,7 +32,8 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
             'Host': proxy_address[0],
             'User-Agent': 'My Custom User Agent',
             'Accept': 'text/html',
-            'secret-connect': f"{address[0]}:{address[1]}"
+            'secret-connect': f"{address[0]}:{address[1]}",
+            "password": f"{password}"
         }
 
         for header, value in headers.items():
