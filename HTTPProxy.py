@@ -34,13 +34,14 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
         self.end_headers()
 
     def do_CONNECT(self):
-        address = self.path.split(':', 1)
-        s = self.try_connect(address)
-        if not s:
-            return
-        self.send_response(200, 'Connection Established')
-        self.end_headers()
-        self.connect_relay(s)
+        if password == "":
+            address = self.path.split(':', 1)
+            s = self.try_connect(address)
+            if not s:
+                return
+            self.send_response(200, 'Connection Established')
+            self.end_headers()
+            self.connect_relay(s)
 
 
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
