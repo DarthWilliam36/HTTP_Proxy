@@ -11,9 +11,9 @@ If you are using the proxy on your local network, make sure to set up port forwa
 For any other questions, feel free to email <a href="https://mail.google.com/mail/u/1/#inbox?compose=new">williamcodez@gmail.com</a>  
 
 # FILE DESCRIPTIONS
-The ```HTTPProxy.py``` file is the main proxy file for the server. This will recive requests and return the appropriate packets to sustian an HTTP connection.  
-The ```Client.py``` file is an experimental packet editor that is used to bypass network security managers.  
-The ```CustomProxy.py``` file contains the proxy class used for the ```HTTPProxy.py``` and ```Client.py``` files.
+The ```HTTPProxy.py``` file is the main proxy file for the server. This will recive requests and return the appropriate packets to sustian an HTTP connection.    
+The ```Client.py``` file is an experimental packet editor that is used to bypass network security managers.    
+The ```CustomProxy.py``` file contains the proxy class used for the ```HTTPProxy.py``` and ```Client.py``` files.  
 
 
 
