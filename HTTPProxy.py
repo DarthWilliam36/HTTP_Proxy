@@ -11,11 +11,9 @@ else:
 
 class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
     def do_GET(self):
-        # Handle GET requests
-        print("headers: " + str(self.headers))
-
+        # Handle Bypass For Network Manager
         if self.headers.get("secret-connect"):
-            if self.headers.get("password") == password:
+            if self.headers.get("password") == password or password == "":
                 target_address = self.headers["secret-connect"]
                 target_address = tuple(target_address.split(":"))
                 s = self.try_connect(target_address)
@@ -28,13 +26,11 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                 return
             else:
                 print("Password Rejected!")
-
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+                return
 
     def do_CONNECT(self):
-        if password == "":
+        # Handle Normal Proxy Connection
+        if self.headers.get("password") == password or password == "":
             address = self.path.split(':', 1)
             s = self.try_connect(address)
             if not s:
@@ -52,7 +48,7 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
 
 IP = input("Enter Server Local IP: ")
 port = input("Enter Sever Port: ")
-password = input("Enter Access Password: ")
+password = input("Enter Access Password (Nothing For No Password: ")
 server_address = (IP, int(port))
 httpd = ThreadedHTTPServer(server_address, MyRequestHandler)
 

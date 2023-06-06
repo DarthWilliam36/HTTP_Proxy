@@ -7,13 +7,12 @@ if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
 else:
     raise RuntimeError("CustomProxy.py not found in directory!")
 
-proxy_address = ("willysgrid.com", 80)
+proxy_address = ("", 80)
+local_port = "80"
 password = ""
 
 
 class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
-    def do_GET(self):
-        print("headers: " + str(self.headers))
 
     def do_CONNECT(self):
         print("Incoming CONNECT packet:")
@@ -49,6 +48,6 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
     pass
 
 
-print("running local server on 127.0.0.1:80")
-httpd = ThreadedHTTPServer(("127.0.0.1", 80), MyRequestHandler)
+print("running local server on 127.0.0.1:81")
+httpd = ThreadedHTTPServer(("127.0.0.1", local_port), MyRequestHandler)
 httpd.serve_forever()
