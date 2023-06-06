@@ -1,18 +1,29 @@
 # HTTPProxy
-HTTP Server Proxy made in Python 
+Python-based HTTP Server Proxy designed to bypass network managers that restrict or block services.
 
-This is a simple HTTP Server proxy made in Python that works by responding to the HTTP CONNECT method and establishing a connection between the target server and the client machine.
-
-# TO SET UP
-On execution, the script will ask you for you local (private) IP. After entering your IP, enter an open port form the server to run on (usually 80).  
+# SET UP ON SERVER 
+On the server you can run:
+```
+sudo python HTTPProxy.py
+```
+The script will then ask you for you local (private) IP. After entering your IP, enter an open port form the server to run on (usually 80).
 
 If you are using the proxy on your local network, make sure to set up port forwarding to the server port you set. This will make sure the router will forward any incoming packets to your device.  
 
-For any other questions, feel free to email <a href="https://mail.google.com/mail/u/1/#inbox?compose=new">williamcodez@gmail.com</a>  
+This is now functioning network proxy on its own but is not able to bypass a network manager. Use the ```Client.py``` script on your local machine to allow this service. 
+
+# SET UP CLIENT
+Before you run this script, you must change the ```proxy_address``` to your servers IP address and ```password``` if nececary. In my case, I needed a domain name in order to properly connect to my server inside the restricted network. This was because they block any connection to a direct IP address. After these steps, run the client with:
+```
+sudo python Client.py
+```
+Make sure to change you browser settings to connect to your 
 
 # FILE DESCRIPTIONS
-The ```HTTPProxy.py``` file is the main proxy file for the server. This will recive requests and return the appropriate packets to sustian an HTTP connection.    
-The ```Client.py``` file is an experimental packet editor that is used to bypass network security managers.    
+The ```HTTPProxy.py``` file is the main proxy file for the server. This will recive requests and return the appropriate packets to sustian an HTTP connection.   
+  
+The ```Client.py``` file is a packet editor that is used to bypass network security managers.    
+  
 The ```CustomProxy.py``` file contains the proxy class used for the ```HTTPProxy.py``` and ```Client.py``` files.  
 
 
