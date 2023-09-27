@@ -32,7 +32,12 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                 ## IMPLEMENT SENDING GET REQUEST WITH URL
                 ## Connect to host
                 host = urlparse(resource)
-                s = self.try_connect(tuple(host, 80))
+                address = (host, 80)
+                print(address)
+                s = self.try_connect(address)
+                if not s:
+                    print("Connection not good")
+                    return
                 #Send get request
                 request = f"GET {resource} HTTP/1.1\r\nHost: {host}\r\n\r\n"
                 s.sendall(request.encode())
@@ -44,6 +49,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
 
     def do_CONNECT(self):
         # Handle Normal Proxy Connection
+        print("connecting using CONNECT method")
         if self.headers.get("password") == password or password == "":
             address = self.path.split(':', 1)
             s = self.try_connect(address)
