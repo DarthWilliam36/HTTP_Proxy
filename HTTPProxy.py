@@ -2,7 +2,6 @@ import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 from urllib.parse import urlparse
-import re
 # import requests CANNOT BE USED ON PROXY SERVER
 
 if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
@@ -28,10 +27,13 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                 return
 
             if self.headers.get("secret-get"):
-                resource = self.headers["secret-get"]
+                url = self.headers["secret-get"]
                 ## IMPLEMENT SENDING GET REQUEST WITH URL
                 ## Connect to host
-                host = urlparse(resource)
+                host = urlparse(url).hostname
+                if not host:
+                    print("could not parse hostname from url!")
+                    return
                 address = (host, 80)
                 print(address)
                 s = self.try_connect(address)
@@ -39,7 +41,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                     print("Connection not good")
                     return
                 #Send get request
-                request = f"GET {resource} HTTP/1.1\r\nHost: {host}\r\n\r\n"
+                request = f"GET {url} HTTP/1.1\r\nHost: {host}\r\n\r\n"
                 s.sendall(request.encode())
                 response = s.recv(65535)
                 self.connection.sendall(response)
