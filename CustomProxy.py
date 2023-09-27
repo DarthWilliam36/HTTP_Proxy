@@ -7,6 +7,9 @@ class CustomProxy:
 
         conns = [self.connection, target_connection]
         self.close_connection = False
+        self.timeout = 5
+        self.connection.settimeout(2)
+        target_connection.settimeout(2)
 
         print("New Connection: " + str(self.connection.getpeername()))
 

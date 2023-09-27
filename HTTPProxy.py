@@ -43,6 +43,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
 
     def do_CONNECT(self):
         # Handle Normal Proxy Connection
+        print("connecting using CONNECT method")
         if self.headers.get("password") == password or password == "":
             address = self.path.split(':', 1)
             s = self.try_connect(address)
