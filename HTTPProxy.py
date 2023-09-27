@@ -2,6 +2,7 @@ import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 from urllib.parse import urlparse
+import re
 # import requests CANNOT BE USED ON PROXY SERVER
 
 if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
