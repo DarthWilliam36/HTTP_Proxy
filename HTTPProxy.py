@@ -1,8 +1,8 @@
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
-import requests
-import socket
+from urllib.parse import urlparse
+# import requests CANNOT BE USED ON PROXY SERVER
 
 if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
     from CustomProxy import CustomProxy
@@ -28,8 +28,14 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
 
             if self.headers.get("secret-get"):
                 resource = self.headers["secret-get"]
-                response = requests.get(resource)
-
+                ## IMPLEMENT SENDING GET REQUEST WITH URL
+                ## Connect to host
+                host = urlparse(resource)
+                s = self.try_connect(host, 80)
+                #Send get request
+                request = f"GET {resource} HTTP/1.1\r\nHost: {host}\r\n\r\n"
+                s.sendall(request.encode())
+                response = s.recv(65535)
                 self.connection.sendall(response)
         else:
             print("Password Rejected!")
