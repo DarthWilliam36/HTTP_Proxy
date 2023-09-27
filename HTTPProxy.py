@@ -1,6 +1,7 @@
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
+import requests
 import socket
 
 if os.path.isfile(os.path.join(os.getcwd(), 'CustomProxy.py')):
@@ -12,8 +13,8 @@ else:
 class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
     def do_GET(self):
         # Handle Bypass For Network Manager
-        if self.headers.get("secret-connect"):
-            if self.headers.get("password") == password or password == "":
+        if self.headers.get("password") == password or password == "":
+            if self.headers.get("secret-connect"):
                 target_address = self.headers["secret-connect"]
                 target_address = tuple(target_address.split(":"))
                 s = self.try_connect(target_address)
@@ -24,9 +25,15 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                 self.end_headers()
                 self.connect_relay(s)
                 return
-            else:
-                print("Password Rejected!")
-                return
+
+            if self.headers.get("secret-get"):
+                resource = self.headers["secret-get"]
+                response = requests.get(resource)
+
+                self.connection.sendall(response)
+        else:
+            print("Password Rejected!")
+            return
 
     def do_CONNECT(self):
         # Handle Normal Proxy Connection

@@ -8,8 +8,8 @@ else:
     raise RuntimeError("CustomProxy.py not found in directory!")
 
 proxy_address = ("", 80)
-local_port = "80"
-password = ""
+local_port = 81
+password = "Doge"
 
 
 class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
