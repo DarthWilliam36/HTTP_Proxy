@@ -32,13 +32,12 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                 ## Connect to host
                 host = urlparse(url).hostname
                 if not host:
-                    print("could not parse hostname from url!")
+                    print("Could not parse hostname from url!")
                     return
                 address = (host, 80)
-                print(address)
                 s = self.try_connect(address)
                 if not s:
-                    print("Connection not good")
+                    print("Connection to host failed!")
                     return
                 #Send get request
                 request = f"GET {url} HTTP/1.1\r\nHost: {host}\r\n\r\n"
@@ -70,7 +69,7 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
 
 IP = input("Enter Server Local IP: ")
 port = input("Enter Sever Port: ")
-password = input("Enter Access Password (Nothing For No Password: ")
+password = input("Enter Access Password (Nothing For No Password): ")
 server_address = (IP, int(port))
 httpd = ThreadedHTTPServer(server_address, MyRequestHandler)
 
