@@ -31,7 +31,7 @@ class MyRequestHandler(BaseHTTPRequestHandler, CustomProxy):
                 ## IMPLEMENT SENDING GET REQUEST WITH URL
                 ## Connect to host
                 host = urlparse(resource)
-                s = self.try_connect(host, 80)
+                s = self.try_connect(tuple(host, 80))
                 #Send get request
                 request = f"GET {resource} HTTP/1.1\r\nHost: {host}\r\n\r\n"
                 s.sendall(request.encode())
