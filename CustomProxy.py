@@ -6,24 +6,31 @@ class CustomProxy:
     def connect_relay(self, target_connection):
 
         conns = [self.connection, target_connection]
-        self.close_connection = False
-        self.timeout = 5
-        self.connection.settimeout(2)
-        target_connection.settimeout(2)
+        self.timeout = 30 * 60
+        self.connection.settimeout(3)
+        target_connection.settimeout(3)
+
+        def close_connections():
+            for conn in conns:
+                conn.close()
 
         print("New Connection: " + str(self.connection.getpeername()))
 
-        while not self.close_connection:
+        while True:
             rlist, wlist, xlist = select.select(conns, [], conns, self.timeout)
             if xlist or not rlist:
-                break
+                print("Connection timeout")
+                close_connections()
+                return
+
             for r in rlist:
                 other = conns[1] if r is conns[0] else conns[0]
                 data = r.recv(65535)
                 if not data:
-                    self.close_connection = True
                     print("Broke Connection: " + str(self.connection.getpeername()))
-                    break
+                    close_connections()
+                    return
+
                 other.sendall(data)
 
     def try_connect(self, address):
